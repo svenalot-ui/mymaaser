@@ -18,7 +18,7 @@
 :root{
   --bg:#FFFFFF; --ink:#12233F; --ink-2:#465775; --ink-3:#5F6E89;
   --accent:#0A44A8; --on-accent:#FFFFFF; --focus:#0A44A8;
-  --tint:#EDF2FB; --hair:#DCE4F1; --warn:#9A3A0B;
+  --tint:#EDF2FB; --hair:#DCE4F1; --warn:#9A3A0B; --seg-on:#0A44A8;
   --font:'Rubik',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
   --ease:cubic-bezier(.22,.7,.2,1);
 }
@@ -26,7 +26,7 @@
   :root{
     --bg:#0A1B3D; --ink:#EEF3FF; --ink-2:#B7C3DD; --ink-3:#95A4C4;
     --accent:#8DB2FF; --on-accent:#FFFFFF; --focus:#A9C5FF;
-    --tint:#12285A; --hair:#22396F; --warn:#F2AB80;
+    --tint:#12285A; --hair:#22396F; --warn:#F2AB80; --seg-on:#1547A8;
   }
 }
 *{box-sizing:border-box}
@@ -56,7 +56,7 @@ h1{margin:0;font-weight:600;font-size:clamp(1.7rem,6vw,2.15rem);line-height:1.15
   color:var(--ink-2);font-weight:500;line-height:1.2;text-align:center;user-select:none;touch-action:manipulation;transition:background-color .18s,color .18s}
 .seg label small{font-size:.78rem;font-weight:400;color:inherit;opacity:.85}
 .seg label:hover{color:var(--ink)}
-.seg input:checked+label{background:var(--accent);color:var(--on-accent)}
+.seg input:checked+label{background:var(--seg-on);color:#FFFFFF}
 .seg input:focus-visible+label{outline:2px solid var(--focus);outline-offset:2px}
 .seg.wide{display:flex;width:100%}
 .seg.wide label{flex:1;padding-inline:.4rem}
@@ -128,6 +128,19 @@ details[open]>summary::after{transform:rotate(-135deg)}
 .lrow.dim{opacity:.55}
 .copy{display:block;min-height:44px;margin:.4rem 0 0;padding:.4rem 0;background:none;border:0;color:var(--accent);font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px;touch-action:manipulation}
 .copy:hover{text-decoration-thickness:2px}
+
+/* Поддержка сайта */
+.support{margin-top:2rem;padding-top:1.4rem;border-top:1px solid var(--hair)}
+.support h2{margin:0 0 .35rem;font-size:1.05rem;font-weight:600}
+.support p{margin:0;color:var(--ink-2);max-width:29rem;text-wrap:pretty}
+.donate{display:flex;align-items:center;justify-content:center;gap:.65rem;min-height:52px;margin-top:1rem;padding:.55rem 1.6rem;
+  border:2px solid var(--accent);border-radius:14px;background:transparent;color:var(--accent);font-weight:600;font-size:1.05rem;text-decoration:none;
+  touch-action:manipulation;transition:background-color .2s,color .2s}
+.donate svg{width:22px;height:22px;flex:none;fill:transparent;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:fill .2s}
+.donate:hover,.donate:focus-visible{background:var(--accent);color:var(--bg)}
+.donate:hover svg,.donate:focus-visible svg{fill:currentColor}
+@media (min-width:560px){.donate{display:inline-flex}}
+.support .support-note{margin-top:.8rem;font-size:.9rem;color:var(--ink-3)}
 
 /* Низ страницы */
 .foot{margin-top:2rem}
@@ -304,6 +317,16 @@ noscript p{padding:1rem}
   </details>
   <button type="button" class="copy" id="copy">Скопировать расчёт</button>
   <p class="sr" id="copyStatus" role="status"></p>
+
+  <section class="support" aria-labelledby="sup-h">
+    <h2 id="sup-h">Поддержать сайт</h2>
+    <p>Калькулятор бесплатный и без рекламы. Если он оказался полезен, вы можете поддержать его работу и развитие.</p>
+    <a class="donate" href="https://pay.cloudtips.ru/p/08b8d4ae" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      <span>Поддержать сайт</span>
+    </a>
+    <p class="support-note">Это добровольная поддержка сайта, а не цдака: в расчёт выше она не входит. Оплата открывается на странице сервиса CloudTips.</p>
+  </section>
 
   <footer class="foot">
     <details class="src">
