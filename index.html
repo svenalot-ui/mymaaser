@@ -4,21 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Калькулятор маасера — מעשר כספים</title>
-<meta name="description" content="Калькулятор маасера кесафим: налоги, расходы, уже отданная цдака, 10% или 20%. Каждое правило с источником. Расчёт выполняется в вашем браузере, суммы нигде не сохраняются.">
+<meta name="description" content="Калькулятор маасера кесафим: налоги, расходы, уже отданная цдака, 10% или 20%. К каждому правилу указан источник и степень согласия поским. Расчёт выполняется в вашем браузере, суммы нигде не сохраняются.">
 <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0A1B3D" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://mymaaser.online/">
 <meta property="og:title" content="Калькулятор маасера — מעשר כספים">
 <meta property="og:description" content="Сколько отделить от заработка, с учётом налогов и расходов и с указанием источников.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://mymaaser.online/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A44A8'/%3E%3Ctext x='32' y='47' font-family='sans-serif' font-weight='600' font-size='40' text-anchor='middle' fill='%23fff'%3E%D7%9E%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/rubik-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/rubik-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
 :root{
   --bg:#FFFFFF; --ink:#12233F; --ink-2:#465775; --ink-3:#5F6E89;
   --accent:#0A44A8; --on-accent:#FFFFFF; --focus:#0A44A8;
-  --tint:#EDF2FB; --hair:#DCE4F1; --warn:#9A3A0B; --seg-on:#0A44A8;
+  --tint:#EDF2FB; --hair:#DCE4F1; --warn:#9A3A0B; --seg-on:#0A44A8; --band:#0A44A8;
   --font:'Rubik',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
   --ease:cubic-bezier(.22,.7,.2,1);
 }
@@ -26,7 +28,7 @@
   :root{
     --bg:#0A1B3D; --ink:#EEF3FF; --ink-2:#B7C3DD; --ink-3:#95A4C4;
     --accent:#8DB2FF; --on-accent:#FFFFFF; --focus:#A9C5FF;
-    --tint:#12285A; --hair:#22396F; --warn:#F2AB80; --seg-on:#1547A8;
+    --tint:#12285A; --hair:#22396F; --warn:#F2AB80; --seg-on:#1547A8; --band:#1547A8;
   }
 }
 *{box-sizing:border-box}
@@ -43,14 +45,19 @@ button{font:inherit}
 @media (min-width:900px){.page{padding-bottom:3rem}}
 
 /* Шапка */
-.top{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:.4rem}
-.he{margin:0;color:var(--accent);font-weight:500;font-size:1.05rem}
-.cur-seg label{min-width:44px;padding:.15rem .4rem}
+.top{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:.9rem}
+.brand{display:flex;align-items:center;gap:.7rem;min-width:0}
+.logo{width:44px;height:44px;flex:none}
+.logo-bg{fill:var(--seg-on)}
+.logo .coin{fill:#fff;transform-box:fill-box;transform-origin:center}
+.logo.drop .coin{animation:coin .7s var(--ease)}
+@keyframes coin{0%{transform:translateY(-8px);opacity:0}30%{opacity:1}75%{transform:translateY(8px);opacity:1}100%{transform:translateY(11px);opacity:0}}
+.he{margin:0;color:var(--accent);font-weight:500;font-size:1.05rem;line-height:1.2;white-space:nowrap}
 h1{margin:0;font-weight:600;font-size:clamp(1.7rem,6vw,2.15rem);line-height:1.15;letter-spacing:-.01em}
-.lede{margin:.55rem 0 0;color:var(--ink-2);max-width:26rem;text-wrap:balance}
+.lede{margin:.55rem 0 0;color:var(--ink-2);max-width:27rem;text-wrap:balance}
 
 /* Переключатели */
-.seg{display:inline-flex;gap:2px;padding:3px;background:var(--tint);border-radius:10px;max-width:100%}
+.seg{display:inline-flex;gap:2px;padding:3px!important;background:var(--tint);border:0;border-radius:10px;max-width:100%}
 .seg input{position:absolute;opacity:0;pointer-events:none}
 .seg label{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;padding:.15rem .9rem;border-radius:8px;cursor:pointer;
   color:var(--ink-2);font-weight:500;line-height:1.2;text-align:center;user-select:none;touch-action:manipulation;transition:background-color .18s,color .18s}
@@ -60,10 +67,14 @@ h1{margin:0;font-weight:600;font-size:clamp(1.7rem,6vw,2.15rem);line-height:1.15
 .seg input:focus-visible+label{outline:2px solid var(--focus);outline-offset:2px}
 .seg.wide{display:flex;width:100%}
 .seg.wide label{flex:1;padding-inline:.4rem}
+.cur-seg label{min-width:40px;padding:.15rem .3rem}
+.brand{gap:.6rem}
+.sub-seg{margin:.15rem 0 .35rem}
 
 /* Поля */
-.fields{margin-top:1.6rem;border-top:1px solid var(--hair)}
+.fields{margin-top:1.5rem;border-top:1px solid var(--hair)}
 .field{border-bottom:1px solid var(--hair);padding:.55rem 0}
+.field[hidden]{display:none}
 .rf{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,10.5rem);align-items:center;column-gap:.6rem;min-height:56px}
 .lab{display:flex;align-items:center;min-width:0}
 .lab label,.lab .lbl{font-weight:500;line-height:1.3}
@@ -76,7 +87,6 @@ h1{margin:0;font-weight:600;font-size:clamp(1.7rem,6vw,2.15rem);line-height:1.15
 .amount input{flex:1;min-width:0;width:100%;text-align:right;border:0;background:none;color:var(--ink);font:500 1.55rem/1.5 var(--font);font-variant-numeric:tabular-nums;padding:.1rem 0;outline:none;-webkit-appearance:none;appearance:none;min-height:44px}
 .amount input::placeholder{color:var(--ink-3);opacity:.6}
 .amount .cur{font-weight:500;color:var(--ink-3)}
-.taxmode{margin:.1rem 0 .35rem}
 .custom{display:none;margin:.7rem 0 .3rem;align-items:center;gap:.6rem}
 .custom.show{display:flex}
 .custom .amount{width:8rem}
@@ -98,8 +108,7 @@ h1{margin:0;font-weight:600;font-size:clamp(1.7rem,6vw,2.15rem);line-height:1.15
 .tag.ask::before{content:"○";color:var(--ink-3)}
 
 /* Итог: единственный яркий блок */
-.band{margin-top:1.8rem;background:var(--accent);color:var(--on-accent);border-radius:18px;padding:1.3rem 1.4rem 1.5rem}
-@media (prefers-color-scheme:dark){.band{background:#1547A8}}
+.band{margin-top:1.8rem;background:var(--band);color:var(--on-accent);border-radius:18px;padding:1.3rem 1.4rem 1.5rem}
 .band-row{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.3rem 1rem}
 .band-k{margin:0;font-weight:500;opacity:.92}
 .band-base{font-weight:500;font-size:clamp(1.5rem,6vw,2rem);line-height:1.2;font-variant-numeric:tabular-nums;margin:0}
@@ -109,12 +118,17 @@ h1{margin:0;font-weight:600;font-size:clamp(1.7rem,6vw,2.15rem);line-height:1.15
 .band-due[data-len=long]{font-size:clamp(2.5rem,12vw,4rem)}
 .band-due[data-len=xlong]{font-size:clamp(2rem,9vw,3.1rem)}
 .band-s{margin:0;font-size:.95rem;line-height:1.45;opacity:.92}
+.prog{height:4px;border-radius:4px;background:rgba(255,255,255,.25);margin:.9rem 0 .4rem;overflow:hidden}
+.prog[hidden]{display:none}
+.prog i{display:block;height:100%;background:#fff;transform-origin:left center;transform:scaleX(0);transition:transform .35s var(--ease)}
+.round{margin:.55rem 0 0;font-size:.95rem;opacity:.95}
+.round[hidden]{display:none}
 
 .notices{display:grid;gap:.5rem;margin-top:.9rem}
 .notice{display:flex;gap:.65rem;align-items:flex-start;font-size:.95rem;line-height:1.5;padding:.1rem 0 .1rem .9rem;border-left:3px solid var(--warn)}
 .notice svg{flex:none;width:18px;height:18px;margin-top:.22rem;fill:none;stroke:var(--warn);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-/* Расчёт и копирование */
+/* Расчёт и действия */
 details>summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:48px;font-weight:500}
 details>summary::-webkit-details-marker{display:none}
 details>summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--ink-3);border-bottom:2px solid var(--ink-3);transform:rotate(45deg);transition:transform .22s var(--ease);margin-right:.35rem}
@@ -126,8 +140,10 @@ details[open]>summary::after{transform:rotate(-135deg)}
 .lrow dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
 .lrow.sum dt,.lrow.sum dd{color:var(--ink);font-weight:600}
 .lrow.dim{opacity:.55}
-.copy{display:block;min-height:44px;margin:.4rem 0 0;padding:.4rem 0;background:none;border:0;color:var(--accent);font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px;touch-action:manipulation}
-.copy:hover{text-decoration-thickness:2px}
+.actions{display:flex;gap:1.4rem;flex-wrap:wrap;margin-top:.4rem}
+.linkbtn{min-height:44px;padding:.4rem 0;background:none;border:0;color:var(--accent);font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px;touch-action:manipulation}
+.linkbtn:hover{text-decoration-thickness:2px}
+.linkbtn.quiet{color:var(--ink-3)}
 
 /* Поддержка сайта */
 .support{margin-top:2rem;padding-top:1.4rem;border-top:1px solid var(--hair)}
@@ -144,29 +160,34 @@ details[open]>summary::after{transform:rotate(-135deg)}
 
 /* Низ страницы */
 .foot{margin-top:2rem}
+.src{border-top:1px solid var(--hair)}
 .src .content{padding:.2rem 0 1rem;color:var(--ink-2);font-size:.95rem}
-.src ol{padding-left:1.2rem;margin:.6rem 0 .9rem;display:grid;gap:.4rem}
+.src h3{margin:1rem 0 .3rem;font-size:.98rem;font-weight:600;color:var(--ink)}
+.src ol{padding-left:1.2rem;margin:.4rem 0 .8rem;display:grid;gap:.4rem}
 .src a{color:var(--ink);text-decoration-color:var(--accent);text-underline-offset:.2em}
 .src a:hover{color:var(--accent)}
 .legend{display:grid;gap:.4rem}
-.src{border-top:1px solid var(--hair)}
 .disclaimer{margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid var(--hair)}
 .disclaimer h2{margin:0 0 .4rem;font-size:1rem;font-weight:600}
 .disclaimer p{margin:0 0 .6rem;font-size:.94rem;color:var(--ink-2);text-wrap:pretty}
 .privacy{margin:1.2rem 0 0;color:var(--ink-3);font-size:.88rem;line-height:1.5}
+.legal{display:flex;flex-wrap:wrap;gap:0 1.4rem;margin:1rem 0 0}
+.legal a{display:inline-flex;align-items:center;min-height:44px;color:var(--ink-2);font-size:.92rem;text-underline-offset:.2em}
+.legal a:hover{color:var(--accent)}
+.fine{display:flex;align-items:center;gap:.7rem;margin:.2rem 0 0;color:var(--ink-3);font-size:.85rem}
+.age{display:inline-block;padding:.05rem .45rem;border:1px solid var(--ink-3);border-radius:5px;font-weight:600;font-size:.8rem;line-height:1.4}
 
 /* Нижняя панель на телефоне */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
-  padding:.75rem 1.1rem calc(.75rem + env(safe-area-inset-bottom));background:var(--accent);color:var(--on-accent);
+  padding:.75rem 1.1rem calc(.75rem + env(safe-area-inset-bottom));background:var(--band);color:var(--on-accent);
   transform:translateY(110%);transition:transform .28s var(--ease)}
-@media (prefers-color-scheme:dark){.dock{background:#1547A8}}
 .dock.show{transform:none}
 .dock span{font-weight:500}
 .dock b{font-weight:600;font-size:1.6rem;line-height:1.1;font-variant-numeric:tabular-nums}
 @media (min-width:900px){.dock{display:none}}
 
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important;transition-delay:0s!important}}
-@media print{.dock,.info,.copy,.seg{display:none!important}.note{grid-template-rows:1fr}.note-clip{visibility:visible}.band{background:#fff;color:#000;border:1px solid #000}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important;transition-delay:0s!important;animation:none!important}}
+@media print{.dock,.info,.actions,.seg,.donate{display:none!important}.note{grid-template-rows:1fr}.note-clip{visibility:visible}.band{background:#fff;color:#000;border:1px solid #000}}
 noscript p{padding:1rem}
 </style>
 </head>
@@ -177,7 +198,17 @@ noscript p{padding:1rem}
 <main class="page">
   <header>
     <div class="top">
-      <p class="he" lang="he" dir="rtl">מעשר כספים</p>
+      <div class="brand">
+        <svg class="logo" id="logo" viewBox="0 0 48 48" aria-hidden="true">
+          <rect class="logo-bg" width="48" height="48" rx="12"/>
+          <g fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="11" y="21" width="26" height="19" rx="4"/>
+            <path d="M20 26.5h8"/>
+          </g>
+          <circle class="coin" cx="24" cy="12" r="3.6"/>
+        </svg>
+        <p class="he" lang="he" dir="rtl">מעשר כספים</p>
+      </div>
       <fieldset class="seg cur-seg" aria-label="Валюта">
         <input type="radio" name="cur" id="c-ILS" value="ILS" checked><label for="c-ILS" aria-label="Шекели">₪</label>
         <input type="radio" name="cur" id="c-USD" value="USD"><label for="c-USD" aria-label="Доллары">$</label>
@@ -186,7 +217,7 @@ noscript p{padding:1rem}
       </fieldset>
     </div>
     <h1>Калькулятор маасера</h1>
-    <p class="lede">Сколько отделить от заработка. К каждому правилу указан источник.</p>
+    <p class="lede">Сколько отделить от заработка. К каждому правилу указан источник и степень согласия поским.</p>
   </header>
 
   <section class="fields" id="calc" aria-label="Данные для расчёта">
@@ -197,36 +228,41 @@ noscript p{padding:1rem}
           <label for="income">Общий доход</label>
           <button type="button" class="info" aria-expanded="false" aria-controls="n-income" aria-label="Пояснение: общий доход"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button>
         </div>
-        <div class="amount"><input id="income" data-money inputmode="decimal" autocomplete="off" placeholder="0"><span class="cur" data-cur aria-hidden="true">₪</span></div>
+        <div class="amount"><input id="income" data-money inputmode="decimal" enterkeyhint="next" autocomplete="off" placeholder="0"><span class="cur" data-cur aria-hidden="true">₪</span></div>
       </div>
+      <fieldset class="seg sub-seg" aria-label="Как указан доход">
+        <input type="radio" name="kind" id="k-gross" value="gross" checked><label for="k-gross">До налогов</label>
+        <input type="radio" name="kind" id="k-net" value="net"><label for="k-net">На руки</label>
+      </fieldset>
       <div class="note" id="n-income"><div class="note-clip"><div class="note-body">
-        <p>Маасер кесафим отделяют от прибыли, то есть от того, что вы действительно заработали: зарплата, премии, комиссионные, доход от дела. Впишите сумму целиком, до вычетов. Вычеты укажете ниже.</p>
-        <p>Подарки, выигрыши, возврат налога, наследство и другие разовые поступления — отдельный вопрос, здесь мнения расходятся. В таких случаях спросите рава.</p>
+        <p>Маасер кесафим отделяют от прибыли, то есть от того, что вы заработали или получили: зарплата, премии, доход от дела, аренда, пособия, подарки. Впишите сумму целиком.</p>
+        <p><strong>До налогов или на руки?</strong> Если вы берёте сумму из платёжки «на руки», выберите «На руки»: налоги в ней уже вычтены, и вводить их отдельно не нужно, иначе они вычтутся дважды. Если считаете с суммы до налогов, выберите «До налогов» и укажите налоги ниже.</p>
+        <p>Наследство, выигрыши и другие крупные разовые поступления лучше обсудить с равом.</p>
         <ul>
-          <li><span class="tag ok">Общепринято</span> Маасер — десятая часть дохода: Рамбам, Матнот Аниим 7:5; Шулхан Арух, Йоре Деа 249:1.</li>
-          <li><span class="tag split">Мнения расходятся</span> Разовые поступления (подарки, выигрыши, наследство).</li>
+          <li><span class="tag ok">Общепринято</span> Десятая часть — «средняя» мера, меньше десятой — «аин ра'а» (скупость): Рамбам, Матнот Аниим 7:5; Шулхан Арух, Йоре Деа 249:1.</li>
+          <li><span class="tag ask">Уточните у рава</span> Наследство, выигрыши и другие разовые поступления.</li>
         </ul>
       </div></div></div>
     </div>
 
-    <div class="field">
+    <div class="field" id="fieldTaxes">
       <div class="rf">
         <div class="lab">
           <label for="taxes">Налоги у источника</label>
           <button type="button" class="info" aria-expanded="false" aria-controls="n-taxes" aria-label="Пояснение: налоги"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button>
         </div>
-        <div class="amount"><input id="taxes" data-money inputmode="decimal" autocomplete="off" placeholder="0"><span class="cur" data-cur aria-hidden="true">₪</span></div>
+        <div class="amount"><input id="taxes" data-money inputmode="decimal" enterkeyhint="next" autocomplete="off" placeholder="0"><span class="cur" data-cur aria-hidden="true">₪</span></div>
       </div>
-      <fieldset class="seg taxmode" aria-label="Как учитывать налоги">
+      <fieldset class="seg sub-seg" aria-label="Как учитывать налоги">
         <input type="radio" name="tax" id="t-deduct" value="deduct" checked><label for="t-deduct">Вычитать</label>
         <input type="radio" name="tax" id="t-keep" value="keep"><label for="t-keep">Не вычитать</label>
       </fieldset>
       <div class="note" id="n-taxes"><div class="note-clip"><div class="note-body">
-        <p>Подоходный налог, национальное страхование и медицинский налог, удержанные у источника, вам в руки не попадают: этими деньгами вы не распоряжаетесь. Поэтому многие поским разрешают считать маасер с суммы после налогов.</p>
-        <p>Более строгое мнение требует считать с суммы до налогов. Если ваш рав или ваша община придерживаются строгого подхода, выберите «Не вычитать».</p>
-        <p>Пенсионные отчисления, керен ишталмут и взносы работодателя — предмет отдельных споров. Без вопроса раву их лучше сюда не вписывать.</p>
+        <p>Подоходный налог и обязательные взносы, удержанные у источника (в Израиле — подоходный налог, национальное страхование, налог на здравоохранение), по мнению рава Моше Файнштейна, вычитаются, потому что это деньги, которые вы не зарабатывали: Игрот Моше, Йоре Деа 1:143 (так же решает Хавот Яир 224). Поэтому по умолчанию калькулятор их вычитает.</p>
+        <p>Налоги на покупки (НДС) и налог на жильё Игрот Моше не вычитает: это налоги на расходы, а не на доход. Во многих общинах считают строже, с суммы до налогов. Если так принято у вас, выберите «Не вычитать».</p>
+        <p>Пенсионные и накопительные отчисления (пенсия, керен ишталмут, взносы работодателя) — отдельный вопрос, сюда их без консультации лучше не вписывать.</p>
         <ul>
-          <li><span class="tag split">Мнения расходятся</span> Игрот Моше, Йоре Деа: в пользу вычета налогов; другие поским требуют считать с суммы до налогов.</li>
+          <li><span class="tag split">Мнения расходятся</span> Игрот Моше ЙД 1:143 и Хавот Яир 224 вычитают подоходный налог; более строгая практика считает с суммы до налогов.</li>
           <li><span class="tag ask">Уточните у рава</span> Пенсия и накопительные отчисления.</li>
         </ul>
       </div></div></div>
@@ -238,14 +274,15 @@ noscript p{padding:1rem}
           <label for="expenses">Расходы на заработок</label>
           <button type="button" class="info" aria-expanded="false" aria-controls="n-expenses" aria-label="Пояснение: расходы на заработок"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button>
         </div>
-        <div class="amount"><input id="expenses" data-money inputmode="decimal" autocomplete="off" placeholder="0"><span class="cur" data-cur aria-hidden="true">₪</span></div>
+        <div class="amount"><input id="expenses" data-money inputmode="decimal" enterkeyhint="next" autocomplete="off" placeholder="0"><span class="cur" data-cur aria-hidden="true">₪</span></div>
       </div>
       <div class="note" id="n-expenses"><div class="note-clip"><div class="note-body">
-        <p>Вычитаются расходы, без которых доход не был бы получен: сырьё и товар, аренда помещения, зарплата сотрудников, транспорт до клиентов, инструменты, налоги предприятия. Маасер отделяют от чистой прибыли, а не от оборота.</p>
-        <p>Не вычитаются личные траты: еда, жильё, одежда, отпуск, содержание семьи. Это расходование уже заработанных денег, а не издержки на их получение.</p>
+        <p>Вычитаются расходы, без которых доход не был бы получен: товар и сырьё, зарплата сотрудников, дорога по работе, одежда и транспорт, которые нужны только для работы, аренда помещения для дела. Маасер считают от прибыли, а не от оборота.</p>
+        <p><strong>Личные расходы</strong> (еда, жильё, одежда для семьи) по умолчанию не вычитаются. Так считает большинство поским: Арух ѓа-Шулхан 249:7, Ахават Хесед 2:18, Игрот Моше ЙД 1:143. Есть и более мягкое мнение, которое допускает такой вычет (Авкат Рохель, Яхава Даат 3:76, Цицъ Элиэзер 10:6), а Ялкут Йосеф допускает его при нужде.</p>
         <ul>
-          <li><span class="tag ok">Общепринято</span> Ахават Хесед 2:19 (Хафец Хаим): маасер считают от прибыли после расходов на заработок.</li>
-          <li><span class="tag ask">Уточните у рава</span> При тяжёлом материальном положении есть послабления, их определяет рав.</li>
+          <li><span class="tag ok">Общепринято</span> Маасер считают от прибыли (ШАрух ЙД 249:1); перечень расходов на заработок — Вайихал Моше, Маасер кесафим 2:6.</li>
+          <li><span class="tag split">Мнения расходятся</span> Личные расходы: большинство не вычитает, часть поским вычитает.</li>
+          <li><span class="tag ask">Уточните у рава</span> Тяжёлое материальное положение.</li>
         </ul>
       </div></div></div>
     </div>
@@ -264,15 +301,15 @@ noscript p{padding:1rem}
       </fieldset>
       <div class="custom" id="customWrap">
         <label for="customRate">Ставка, %</label>
-        <div class="amount"><input id="customRate" inputmode="decimal" autocomplete="off" placeholder="15" maxlength="5"><span class="cur" aria-hidden="true">%</span></div>
+        <div class="amount"><input id="customRate" inputmode="decimal" enterkeyhint="next" autocomplete="off" placeholder="15" maxlength="5"><span class="cur" aria-hidden="true">%</span></div>
       </div>
       <div class="note" id="n-rate"><div class="note-clip"><div class="note-body">
-        <p><strong>10% — маасер.</strong> Обычная мера: Рамбам называет десятую часть средним размером цдаки.</p>
-        <p><strong>20% — хомеш</strong>, пятая часть. Это верхний предел, а не обязанность: в Уше постановили не тратить на цдаку больше пятой части, чтобы самому не обеднеть. Это мицва мин ѓа-мувхар, то есть наилучший способ, но не долг.</p>
-        <p>Некоторые считают хомеш как «маасер дважды»: 10% и ещё 10% от остатка, то есть 19%. Для такого расчёта выберите «Своя» и введите 19.</p>
+        <p><strong>10% — маасер.</strong> Рамбам называет десятую часть «средней» мерой, а отдавать меньше — «аин ра'а» (скупостью).</p>
+        <p><strong>20% — хомеш</strong>, пятая часть. Это «мицва мин ѓа-мувхар», то есть наилучший способ, но не обязанность. По Шулхан Аруху, хомеш в первый год отделяют от капитала, а дальше — от прибыли каждого года.</p>
+        <p><strong>20% — это и верхний предел.</strong> В Уше мудрецы постановили не тратить на цдаку больше пятой части, чтобы самому не обеднеть (Ктубот 50а). Это относится только к жизни: перед смертью можно отдать больше (Ктубот 67б; Рема ЙД 249:1). Гемара выводит 20% из слов Яакова «асер а-асренну» и уточняет, что вторая десятина считается так же, как первая, то есть от всей суммы.</p>
+        <p>Выберите «Своя», если рав назвал вам другую долю.</p>
         <ul>
-          <li><span class="tag ok">Общепринято</span> Ктубот 50а; Шулхан Арух, Йоре Деа 249:1; Рамбам, Матнот Аниим 7:5.</li>
-          <li><span class="tag ask">Уточните у рава</span> Хомеш от капитала обычно отделяют один раз, затем от прибыли (Ахават Хесед 2:19). Способ счёта определяется обычаем общины.</li>
+          <li><span class="tag ok">Общепринято</span> Рамбам, Матнот Аниим 7:5; Шулхан Арух, Йоре Деа 249:1; Ктубот 50а и 67б.</li>
         </ul>
       </div></div></div>
     </div>
@@ -283,15 +320,16 @@ noscript p{padding:1rem}
           <label for="paid">Уже отдано как маасер</label>
           <button type="button" class="info" aria-expanded="false" aria-controls="n-paid" aria-label="Пояснение: уже отданная цдака"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button>
         </div>
-        <div class="amount"><input id="paid" data-money inputmode="decimal" autocomplete="off" placeholder="0"><span class="cur" data-cur aria-hidden="true">₪</span></div>
+        <div class="amount"><input id="paid" data-money inputmode="decimal" enterkeyhint="done" autocomplete="off" placeholder="0"><span class="cur" data-cur aria-hidden="true">₪</span></div>
       </div>
       <div class="note" id="n-paid"><div class="note-clip"><div class="note-body">
         <p>Цдака, которую вы уже отдали именно как маасер с этого дохода, вычитается из итога.</p>
-        <p>Не засчитывается то, что вы и так обязаны: содержание жены и детей, плата за обучение собственных детей, покупка мицвот для себя (лулав, тфилин), а также всё, за что вы получили личную выгоду.</p>
-        <p>Если отдано больше нужного, многие поским разрешают зачесть излишек в счёт будущих доходов. Уточните у рава.</p>
+        <p><strong>Что не засчитывается.</strong> Маасер отдают бедным. Из него нельзя покупать вещи для мицв, например свечи в синагогу (Рема ЙД 249:1). Содержание жены и малолетних детей, пока вы обязаны их содержать, большинство поским из маасера тоже не оплачивает. Об оплате обучения детей мнения расходятся: Игрот Моше ЙД 2:113 запрещает, Лекет Йошер допускает то, что сверх обязанности.</p>
+        <p><strong>Заранее и с излишком.</strong> Деньги, отданные заранее с условием «засчитать в будущий маасер», зачесть можно (Даркей Моше ЙД 250:1; Арух ѓа-Шулхан 249:7). Если такого условия не было, зачёт излишка — вопрос к раву.</p>
         <ul>
-          <li><span class="tag ok">Общепринято</span> Маасер нельзя тратить на обязательства, которые лежат на вас и без него: Рема к Шулхан Арух, Йоре Деа 249:1.</li>
-          <li><span class="tag split">Мнения расходятся</span> Зачёт излишка на будущее.</li>
+          <li><span class="tag ok">Общепринято</span> На мицвы вроде свечей для синагоги маасер не тратят: Рема ЙД 249:1.</li>
+          <li><span class="tag split">Мнения расходятся</span> Обучение собственных детей.</li>
+          <li><span class="tag ask">Уточните у рава</span> Зачёт излишка, отданного без условия.</li>
         </ul>
       </div></div></div>
     </div>
@@ -306,7 +344,9 @@ noscript p{padding:1rem}
     <hr>
     <p class="band-k">К отделению</p>
     <output class="band-due" id="due" aria-live="polite">0 ₪</output>
-    <p class="band-s" id="dueSub">10% от базы (маасер)</p>
+    <p class="band-s" id="dueSub">Введите доход, и здесь появится сумма</p>
+    <div class="prog" id="prog" hidden><i id="progBar"></i></div>
+    <p class="round" id="round" hidden></p>
   </section>
 
   <div class="notices" id="notices"></div>
@@ -315,7 +355,10 @@ noscript p{padding:1rem}
     <summary>Как посчитано</summary>
     <dl class="ledger" id="ledger"></dl>
   </details>
-  <button type="button" class="copy" id="copy">Скопировать расчёт</button>
+  <div class="actions">
+    <button type="button" class="linkbtn" id="copy">Скопировать расчёт</button>
+    <button type="button" class="linkbtn quiet" id="clear">Очистить</button>
+  </div>
   <p class="sr" id="copyStatus" role="status"></p>
 
   <section class="support" aria-labelledby="sup-h">
@@ -330,31 +373,49 @@ noscript p{padding:1rem}
 
   <footer class="foot">
     <details class="src">
-      <summary>Источники и пометки</summary>
+      <summary>Источники и проверка</summary>
       <div class="content">
         <div class="legend">
           <div><span class="tag ok">Общепринято</span> По этому правилу нет существенных разногласий.</div>
           <div><span class="tag split">Мнения расходятся</span> Поским решают по-разному, выбор за вами и вашим равом.</div>
-          <div><span class="tag ask">Уточните у рава</span> Зависит от обстоятельств или требует сверки.</div>
+          <div><span class="tag ask">Уточните у рава</span> Зависит от обстоятельств или требует консультации.</div>
         </div>
+
+        <h3>Сверено с текстом источника</h3>
         <ol>
-          <li><a href="https://www.sefaria.org/Ketubot.50a" target="_blank" rel="noopener noreferrer">Ктубот 50а</a>: постановление Уши не тратить на цдаку больше пятой части.</li>
-          <li><a href="https://www.sefaria.org/Mishneh_Torah,_Gifts_to_the_Poor.7" target="_blank" rel="noopener noreferrer">Рамбам, Матнот Аниим, гл. 7</a>: десятая часть как средняя мера, пятая как наилучшая.</li>
-          <li><a href="https://www.sefaria.org/Shulchan_Arukh,_Yoreh_De'ah.249" target="_blank" rel="noopener noreferrer">Шулхан Арух, Йоре Деа 249</a>: законы о размере цдаки, с комментарием Ремы.</li>
-          <li><a href="https://www.sefaria.org/search?q=Ahavat%20Chesed" target="_blank" rel="noopener noreferrer">Ахават Хесед</a> (Хафец Хаим), ч. 2, гл. 19: расчёт от прибыли и хомеш.</li>
-          <li>Игрот Моше (рав Моше Файнштейн), Йоре Деа: о налогах и расчёте с зарплаты.</li>
+          <li><a href="https://www.sefaria.org/Ketubot.50a" target="_blank" rel="noopener noreferrer">Ктубот 50а</a>: постановление Уши не тратить на цдаку больше пятой части; вывод из слов Яакова «асер а-асренну».</li>
+          <li><a href="https://www.sefaria.org/Ketubot.67b" target="_blank" rel="noopener noreferrer">Ктубот 67б</a>: предел в пятую часть действует только при жизни.</li>
+          <li><a href="https://www.sefaria.org/Mishneh_Torah,_Gifts_to_the_Poor.7.5" target="_blank" rel="noopener noreferrer">Рамбам, Матнот Аниим 7:5</a>: пятая часть — наилучший способ, десятая — средняя мера, меньше — «аин ра'а».</li>
+          <li><a href="https://www.sefaria.org/Shulchan_Arukh,_Yoreh_De'ah.249.1" target="_blank" rel="noopener noreferrer">Шулхан Арух, Йоре Деа 249:1</a> с Ремой: хомеш в первый год от капитала, далее от прибыли; нельзя тратить больше пятой части; маасер не тратят на мицвы вроде свечей для синагоги.</li>
         </ol>
-        <p>Ссылки ведут на тексты, по которым можно проверить сказанное. Формулировки в подсказках — краткое изложение, а не дословная цитата.</p>
+
+        <h3>Приведено по цитированию в современных обзорах</h3>
+        <p>Эти книги не удалось открыть в первоисточнике, поэтому их положения приведены по обзорам с точными ссылками: <a href="https://www.halachipedia.com/index.php?title=Tzedaka" target="_blank" rel="noopener noreferrer">Halachipedia</a>, <a href="https://dinonline.org/2020/06/15/giving-tzedaka/" target="_blank" rel="noopener noreferrer">Din Online</a>, <a href="https://outorah.org/p/51498/" target="_blank" rel="noopener noreferrer">OU</a>. Перед практическим применением сверяйте их с оригиналом.</p>
+        <ol>
+          <li>Игрот Моше, Йоре Деа 1:143 (подоходный налог; налоги на покупки и жильё не вычитаются; личные расходы) и 2:113 (обучение детей).</li>
+          <li>Хавот Яир 224 (подоходный налог).</li>
+          <li>Арух ѓа-Шулхан 249:7; Ахават Хесед (Хафец Хаим) 2:18 (личные расходы); Авкат Рохель, Яхава Даат 3:76, Цицъ Элиэзер 10:6 (мягкое мнение); Ялкут Йосеф ЙД 247:10.</li>
+          <li>Вайихал Моше, Маасер кесафим 2:6 (перечень расходов на заработок).</li>
+          <li>Даркей Моше ЙД 250:1 (отданное заранее с условием).</li>
+        </ol>
+        <p>Формулировки в подсказках — краткое изложение, а не дословная цитата. Заметили неточность? <a href="https://github.com/svenalot-ui/mymaaser/issues" target="_blank" rel="noopener noreferrer">Сообщите автору</a>.</p>
       </div>
     </details>
 
     <aside class="disclaimer" aria-labelledby="dis-h">
       <h2 id="dis-h">Важно</h2>
-      <p>Калькулятор — справочный инструмент, а не галахическое решение. Мнения поским расходятся, а жизненные обстоятельства бывают разными.</p>
+      <p>Калькулятор — справочный инструмент, а не галахическое решение, не юридическая, налоговая или финансовая консультация. Мнения поским расходятся, а жизненные обстоятельства бывают разными.</p>
       <p>В сложных случаях (нестандартный доход, наследство, выигрыш, пенсионные накопления, оборотный капитал бизнеса, тяжёлое материальное положение, спорные вычеты) обязательно задайте <em>шаалат хахам</em>, то есть вопрос раву, и следуйте традиции вашей общины.</p>
     </aside>
 
-    <p class="privacy">Расчёт выполняется в вашем браузере. Суммы нигде не хранятся и никуда не отправляются. На устройстве запоминаются только валюта и выбранная ставка.</p>
+    <p class="privacy">Расчёт выполняется в вашем браузере. Суммы нигде не хранятся и никуда не отправляются. На устройстве запоминаются только валюта, ставка и способ учёта налогов.</p>
+
+    <nav class="legal" aria-label="Юридическая информация">
+      <a href="privacy.html">Политика конфиденциальности</a>
+      <a href="terms.html">Условия использования</a>
+      <a href="https://github.com/svenalot-ui/mymaaser/issues" target="_blank" rel="noopener noreferrer">Сообщить об ошибке</a>
+    </nav>
+    <p class="fine"><span>© 2026 mymaaser.online</span><span class="age" title="Знак информационной продукции">0+</span></p>
   </footer>
 </main>
 
@@ -367,7 +428,7 @@ noscript p{padding:1rem}
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const SYMBOL = { ILS: '₪', USD: '$', EUR: '€', RUB: '₽' };
-  const state = { cur: 'ILS', rate: '10', custom: '', tax: 'deduct' };
+  const state = { cur: 'ILS', rate: '10', custom: '', tax: 'deduct', kind: 'gross' };
 
   /* Настройки (только предпочтения, суммы не сохраняются) */
   try {
@@ -376,6 +437,7 @@ noscript p{padding:1rem}
     if (['10', '20', 'custom'].includes(p.rate)) state.rate = p.rate;
     if (typeof p.custom === 'string' && /^\d{0,3}([.,]\d{0,2})?$/.test(p.custom)) state.custom = p.custom;
     if (['deduct', 'keep'].includes(p.tax)) state.tax = p.tax;
+    if (['gross', 'net'].includes(p.kind)) state.kind = p.kind;
   } catch (e) {}
   const savePrefs = () => { try { localStorage.setItem('maaser.prefs', JSON.stringify(state)); } catch (e) {} };
 
@@ -436,14 +498,15 @@ noscript p{padding:1rem}
   }
 
   const ICON_ALERT = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>';
-  let last = null;
+  let last = null, lastDue = 0, userTouched = false, coinTimer = 0;
 
   function compute() {
+    const net = state.kind === 'net';
     const inc = parseCents($('#income').value);
-    const tax = parseCents($('#taxes').value);
+    const tax = net ? 0 : parseCents($('#taxes').value);
     const exp = parseCents($('#expenses').value);
     const paid = parseCents($('#paid').value);
-    const taxApplied = state.tax === 'deduct' ? tax : 0;
+    const taxApplied = (!net && state.tax === 'deduct') ? tax : 0;
     const base = Math.max(0, inc - taxApplied - exp);
     const customPct = parseFloat((state.custom || '').replace(',', '.'));
     const pct = state.rate === 'custom' ? (isFinite(customPct) ? Math.min(100, customPct) : 0) : Number(state.rate);
@@ -451,7 +514,15 @@ noscript p{padding:1rem}
     const due = Math.max(0, total - paid);
     const over = inc > 0 ? Math.max(0, paid - total) : 0;
     const pctLabel = (Number.isInteger(pct) ? pct : pct.toString().replace('.', ',')) + '%';
-    return { inc, tax, exp, paid, taxApplied, base, pct, total, due, over, pctLabel };
+    return { net, inc, tax, exp, paid, taxApplied, base, pct, total, due, over, pctLabel };
+  }
+
+  function dropCoin() {
+    if (reduced) return;
+    clearTimeout(coinTimer);
+    coinTimer = setTimeout(() => {
+      const l = $('#logo'); l.classList.remove('drop'); void l.getBoundingClientRect(); l.classList.add('drop');
+    }, 350);
   }
 
   function render() {
@@ -461,16 +532,34 @@ noscript p{padding:1rem}
     setNum($('#dockVal'), r.due);
 
     const rateName = state.rate === '10' ? 'маасер' : state.rate === '20' ? 'хомеш' : 'своя ставка';
-    $('#baseSub').textContent = state.tax === 'deduct'
-      ? 'Доход минус налоги и расходы'
-      : 'Доход минус расходы (налоги не вычитаются)';
-    $('#dueSub').textContent = r.paid > 0
-      ? `${r.pctLabel} от базы (${rateName}) — ${fmt(r.total)}, за вычетом ${fmt(r.paid)}`
-      : `${r.pctLabel} от базы (${rateName})`;
+    $('#baseSub').textContent = r.net
+      ? 'Доход на руки минус расходы'
+      : state.tax === 'deduct' ? 'Доход минус налоги и расходы' : 'Доход минус расходы (налоги не вычитаются)';
+    const empty = !r.inc && !r.paid;
+    $('#dueSub').textContent = empty
+      ? 'Введите доход, и здесь появится сумма'
+      : r.paid > 0
+        ? `${r.pctLabel} от базы (${rateName}) — ${fmt(r.total)}, за вычетом ${fmt(r.paid)}`
+        : `${r.pctLabel} от базы (${rateName})`;
+
+    /* Сколько из нужного уже отдано */
+    const prog = $('#prog');
+    prog.hidden = !(r.total > 0 && r.paid > 0);
+    $('#progBar').style.transform = `scaleX(${r.total ? Math.min(1, r.paid / r.total).toFixed(4) : 0})`;
+
+    /* Округление вверх до целого: удобно отдавать ровную сумму */
+    const up = Math.ceil(r.due / 100) * 100;
+    const round = $('#round');
+    if (r.due > 0 && up > r.due) { round.hidden = false; round.textContent = `Округлённо вверх: ${fmt(up)}`; } else { round.hidden = true; }
+
+    /* Налоговые поля не нужны, если доход указан на руки */
+    $('#fieldTaxes').hidden = r.net;
 
     const rows = [
-      ['Общий доход', fmt(r.inc), r.inc === 0],
-      [state.tax === 'deduct' ? 'Налоги у источника' : 'Налоги (не вычитаются)', state.tax === 'deduct' ? minus(r.tax) : '—', r.tax === 0 || state.tax !== 'deduct'],
+      ['Общий доход' + (r.net ? ' (на руки)' : ''), fmt(r.inc), r.inc === 0],
+      r.net
+        ? ['Налоги', 'уже вычтены', true]
+        : [state.tax === 'deduct' ? 'Налоги у источника' : 'Налоги (не вычитаются)', state.tax === 'deduct' ? minus(r.tax) : '—', r.tax === 0 || state.tax !== 'deduct'],
       ['Расходы на заработок', minus(r.exp), r.exp === 0],
       ['База для расчёта', fmt(r.base), false, 'sum'],
       [`Ставка ${r.pctLabel}`, fmt(r.total), r.total === 0],
@@ -484,8 +573,12 @@ noscript p{padding:1rem}
     if (r.inc > 0 && r.taxApplied + r.exp > r.inc) msgs.push('Налоги и расходы больше дохода, поэтому база принята равной нулю. Проверьте суммы.');
     if (state.rate === 'custom' && r.pct > 20) msgs.push('Ставка выше хомеша (20%). Согласно Ктубот 50а, не следует тратить на цдаку больше пятой части.');
     if (state.rate === 'custom' && !state.custom) msgs.push('Введите свою ставку в процентах.');
-    if (r.over > 0) msgs.push(`Отдано больше нужного на ${fmt(r.over)}. Многие поским разрешают зачесть излишек в счёт будущих доходов; уточните у рава.`);
+    if (!r.net && r.tax > 0 && r.inc > 0 && r.tax * 100 / r.inc > 60) msgs.push('Налоги составляют больше 60% дохода. Возможно, вы указали доход «на руки»: тогда выберите «На руки» под суммой дохода.');
+    if (r.over > 0) msgs.push(`Отдано больше нужного на ${fmt(r.over)}. Зачесть ли излишек в счёт будущих доходов, лучше спросить у рава.`);
     $('#notices').innerHTML = msgs.map(m => `<div class="notice">${ICON_ALERT}<span>${m}</span></div>`).join('');
+
+    if (userTouched && r.due !== lastDue) dropCoin();
+    lastDue = r.due;
     updateDock();
   }
 
@@ -504,24 +597,42 @@ noscript p{padding:1rem}
     $('#' + btn.getAttribute('aria-controls')).dataset.open = String(!open);
   }));
 
+  /* Ввод: Enter переходит к следующему полю */
+  const moneyInputs = () => $$('[data-money], #customRate').filter(el => el.offsetParent !== null);
+  $$('[data-money], #customRate').forEach(el => el.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const list = moneyInputs(), i = list.indexOf(el);
+    if (i >= 0 && i < list.length - 1) list[i + 1].focus(); else el.blur();
+  }));
+
   /* События */
-  $$('[data-money]').forEach(el => el.addEventListener('input', () => { formatField(el); render(); }));
+  $$('[data-money]').forEach(el => el.addEventListener('input', () => { userTouched = true; formatField(el); render(); }));
   $$('input[name=cur]').forEach(el => el.addEventListener('change', () => {
     state.cur = el.value; $$('[data-cur]').forEach(s => s.textContent = SYMBOL[state.cur]); savePrefs(); render();
   }));
-  $$('input[name=tax]').forEach(el => el.addEventListener('change', () => { state.tax = el.value; savePrefs(); render(); }));
+  $$('input[name=tax]').forEach(el => el.addEventListener('change', () => { userTouched = true; state.tax = el.value; savePrefs(); render(); }));
+  $$('input[name=kind]').forEach(el => el.addEventListener('change', () => { userTouched = true; state.kind = el.value; savePrefs(); render(); }));
   const customWrap = $('#customWrap'), customInput = $('#customRate');
   $$('input[name=rate]').forEach(el => el.addEventListener('change', () => {
+    userTouched = true;
     state.rate = el.value;
     customWrap.classList.toggle('show', state.rate === 'custom');
     if (state.rate === 'custom') customInput.focus();
     savePrefs(); render();
   }));
   customInput.addEventListener('input', () => {
+    userTouched = true;
     let s = customInput.value.replace(/[^\d.,]/g, '').replace('.', ',');
     const i = s.indexOf(','); if (i >= 0) s = s.slice(0, i + 1) + s.slice(i + 1).replace(/,/g, '').slice(0, 2);
     s = s.replace(/^(\d{3})\d+/, '$1');
     customInput.value = s; state.custom = s; savePrefs(); render();
+  });
+
+  /* Очистка сумм (настройки остаются) */
+  $('#clear').addEventListener('click', () => {
+    $$('[data-money]').forEach(el => { el.value = ''; });
+    userTouched = false; render(); $('#income').focus();
   });
 
   /* Копирование расчёта */
@@ -529,9 +640,9 @@ noscript p{padding:1rem}
   copyBtn.addEventListener('click', async () => {
     const r = last || compute();
     const text = [
-      'Маасер — расчёт',
-      `Доход: ${fmt(r.inc)}`,
-      state.tax === 'deduct' ? `Налоги: −${fmt(r.tax)} (вычтены)` : `Налоги: ${fmt(r.tax)} (не вычитаются)`,
+      'Маасер — расчёт (mymaaser.online)',
+      r.net ? `Доход на руки: ${fmt(r.inc)}` : `Доход: ${fmt(r.inc)}`,
+      r.net ? 'Налоги: уже вычтены' : (state.tax === 'deduct' ? `Налоги: −${fmt(r.tax)} (вычтены)` : `Налоги: ${fmt(r.tax)} (не вычитаются)`),
       `Расходы на заработок: −${fmt(r.exp)}`,
       `База: ${fmt(r.base)}`,
       `Ставка ${r.pctLabel}: ${fmt(r.total)}`,
@@ -557,6 +668,7 @@ noscript p{padding:1rem}
   $(`#c-${state.cur}`).checked = true;
   $$('[data-cur]').forEach(s => s.textContent = SYMBOL[state.cur]);
   $(`#t-${state.tax}`).checked = true;
+  $(`#k-${state.kind}`).checked = true;
   $(`#r-${state.rate}`).checked = true;
   customWrap.classList.toggle('show', state.rate === 'custom');
   customInput.value = state.custom;
